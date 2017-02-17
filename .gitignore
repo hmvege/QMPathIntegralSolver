@@ -3,5 +3,7 @@
 !/**/
 !*.*
 
-# Binaries
+# Builds, binaries, .o files
 bin/
+build/
+*.o
