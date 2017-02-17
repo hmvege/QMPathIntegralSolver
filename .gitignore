@@ -3,7 +3,10 @@
 !/**/
 !*.*
 
-# Builds, binaries, .o files
+# Builds, binaries, executables
 bin/
 build/
 *.o
+
+# Picture files
+*.png
