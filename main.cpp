@@ -22,7 +22,7 @@ int main(int nargs, char *args[])
     int NTherm  = 10;        // Number of times we are to thermalize
     int N       = 20;       // Points in path at lattice, looking at a 2D lattice, but modelling the possible paths as columns of a matrix
     int NCor    = 20;       // Only keeping every 20th path
-    int NCf     = 10000;     // Number of random path or path configurations
+    int NCf     = 1e5;     // Number of random path or path configurations
 
     Action S(N,a);
     S.setPotential(potential);
@@ -31,6 +31,9 @@ int main(int nargs, char *args[])
     metropolis.setAction(&S);
     metropolis.setGammaFunctional(&gammaFunctional);
     metropolis.runMetropolis("gammaFunctional.txt");
+
+    metropolis.setGammaFunctional(&gammaFunctional2);
+    metropolis.runMetropolis("gammaFunctional2.txt");
 
     cout << "Program finished." << endl;
     return 0;

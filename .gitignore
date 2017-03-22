@@ -10,3 +10,10 @@ build/
 
 # Picture files
 *.png
+
+# Data files
+*.txt
+
+# Junk
+.qmake*
+*.user

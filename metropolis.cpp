@@ -166,7 +166,7 @@ void Metropolis::writeStatisticsToFile(const char *filename, double * dE, double
     // Calculating the uncertainty in dE(hand calculation for analytic expression done beforehand)
     for (int n = 0; n < N; n++)
     {
-        dE_std[n] = dE[n]*sqrt(pow(standardDeviation[n]/averagedGamma[n],2) + pow(standardDeviation[(n+1)%N]/averagedGamma[(n+1)%N],2))/a;
+        dE_std[n] = sqrt(pow(standardDeviation[n]/averagedGamma[n],2) + pow(standardDeviation[(n+1)%N]/averagedGamma[(n+1)%N],2))/a;
     }
 
     // Initializing file and writing to file
