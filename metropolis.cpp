@@ -111,7 +111,6 @@ void Metropolis::runMetropolis(const char *filename)
     {
         deltaE[n] = log(averagedGamma[n]/averagedGamma[(n+1) % N])/a;
     }
-//    deltaE[N-1] = log(averagedGamma[N-1]/averagedGamma[0])/a; // Ensuring that the last energy also gets counted
 
     // Printing the energies in the calculation
     for (int n = 0; n < N; n++)
