@@ -16,4 +16,4 @@ build/
 
 # Junk
 .qmake*
-*.user
+*.user*
