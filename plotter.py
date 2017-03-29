@@ -1,7 +1,9 @@
 import numpy as np, matplotlib.pyplot as plt
 
+figure_folder = "figures/"
+
 def gf1():
-	filename = "gammaFunctional.txt"
+	filename = "gammaFunctional_stats.txt"
 
 	data = np.loadtxt("%s" % filename,skiprows=4)
 
@@ -17,10 +19,10 @@ def gf1():
 	plt.xlabel(r"$t$",fontsize="18")
 	plt.ylabel(r"$\Delta E$",fontsize="18")
 	plt.grid()
-	plt.savefig("%s.png" % filename.split('.')[0],dpi=300)
+	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
 
 def gf2():
-	filename = "gammaFunctional2.txt"
+	filename = "gammaFunctional_stats2.txt"
 
 	data = np.loadtxt("%s" % filename,skiprows=4)
 
@@ -37,7 +39,7 @@ def gf2():
 	plt.xlabel(r"$t$",fontsize="18")
 	plt.ylabel(r"$\Delta E$",fontsize="18")
 	plt.grid()
-	plt.savefig("%s.png" % filename.split('.')[0],dpi=300)
+	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
 
 if __name__ == '__main__':
 	gf1()

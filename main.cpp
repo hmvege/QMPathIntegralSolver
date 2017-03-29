@@ -33,7 +33,7 @@ int main()
     metropolis.setGammaFunctional(&gammaFunctional);
     metropolis.runMetropolis();
     metropolis.getStatistics();
-    metropolis.writeDataToFile("gammaFuncitonal_raw.txt");
+    metropolis.writeDataToFile("gammaFunctional_gamma.txt");
     metropolis.writeStatisticsToFile("gammaFunctional_stats.txt");
     metropolis.printEnergies();
 
@@ -41,8 +41,8 @@ int main()
     metropolis.setGammaFunctional(&gammaFunctional2);
     metropolis.runMetropolis();
     metropolis.getStatistics();
-    metropolis.writeDataToFile("gammaFuncitonal2_raw.txt");
-    metropolis.writeStatisticsToFile("gammaFunctional_stats2.txt");
+    metropolis.writeDataToFile("gammaFunctional2_gamma.txt");
+    metropolis.writeStatisticsToFile("gammaFunctional2_stats.txt");
     metropolis.printEnergies();
 
     cout << "Program finished." << endl;
