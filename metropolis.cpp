@@ -12,6 +12,10 @@ void printArray(double *x, int N);
 
 Metropolis::Metropolis(int new_N, int new_NCf, int new_NCor, int new_Therm, double new_epsilon, double new_a)
 {
+    /*
+     * Class for calculating correlators using the Metropolis algorithm.
+     * Takes an action object as well as a Gamma functional to be used in the action.
+     */
     N = new_N;
     NCf = new_NCf;
     NCor = new_NCor;
@@ -19,13 +23,29 @@ Metropolis::Metropolis(int new_N, int new_NCf, int new_NCor, int new_Therm, doub
     epsilon = new_epsilon;
     a = new_a;
 }
+Metropolis::~Metropolis()
+{
+    /*
+     * Class destructor
+     */
+    for (int i = 0; i < NCf; i++) { delete [] Gamma[i]; }
+    delete [] Gamma;
+    delete [] averagedGamma;
+    delete [] averagedGammaSquared;
+    delete [] varianceGamma;
+    delete [] stdGamma;
+    delete [] deltaE;
+    delete [] deltaE_std;
+}
 
 void Metropolis::update(double *x,
                         std::mt19937_64 &gen,
                         std::uniform_real_distribution<double> &epsilon_distribution,
-                        std::uniform_real_distribution<double> &uniform_distribution,
-                        int &acceptanceCounter)
+                        std::uniform_real_distribution<double> &uniform_distribution)
 {
+    /*
+     * Private function used for updating our system. Performs the Metropolis algorithm
+     */
     for (int i = 0; i < N; i++)
     {
         double x_prev = x[i];
@@ -44,27 +64,15 @@ void Metropolis::update(double *x,
     }
 }
 
-void Metropolis::runMetropolis(const char *filename)
+void Metropolis::runMetropolis()
 {
     // Setting up random generators
     std::mt19937_64 generator(std::time(nullptr)); // Starting up the Mersenne-Twister19937 function
     std::uniform_real_distribution<double> epsilon_distribution(-epsilon, epsilon);
     std::uniform_real_distribution<double> uniform_distribution(0,1);
 
-    // Setting up array for averaged Gamma-values, variance and Metropolis acceptance counter
-    int acceptanceCounter = 0;
-    double * averagedGamma = new double[N];
-    double * averagedGammaSquared = new double[N];
-    double * deltaE = new double[N];
-    for (int i = 0; i < N; i++)
-    {
-        averagedGamma[i] = 0;
-        averagedGammaSquared[i] = 0;
-        deltaE[i] = 0;
-    }
-
     // Setting up array for Gamma-functional values
-    double ** Gamma = new double*[NCf];
+    Gamma = new double*[NCf];
     for (int i = 0; i < NCf; i++) { Gamma[i] = new double[N]; }
     for (int i = 0; i < NCf; i++) { for (int j = 0; j < N; j++) { Gamma[i][j] = 0; } } // Setting matrix elements to zero
 
@@ -75,7 +83,7 @@ void Metropolis::runMetropolis(const char *filename)
     // Running thermalization
     for (int i = 0; i < NTherm * NCor; i++)
     {
-        update(x, generator, epsilon_distribution, uniform_distribution, acceptanceCounter);
+        update(x, generator, epsilon_distribution, uniform_distribution);
     }
 
     // Setting the Metropolis acceptance counter to 0 in order not to count the thermalization
@@ -86,12 +94,38 @@ void Metropolis::runMetropolis(const char *filename)
     {
         for (int i = 0; i < NCor; i++) // Updating NCor times before updating the Gamma function
         {
-            update(x, generator, epsilon_distribution, uniform_distribution, acceptanceCounter);
+            update(x, generator, epsilon_distribution, uniform_distribution);
         }
         for (int n = 0; n < N; n++)
         {
             Gamma[alpha][n] = gammaFunctional(x,n,N);
         }
+    }
+    printf("Acceptancerate: %f \n", double(acceptanceCounter)/double(NCf*NCor*N));
+
+    // De-allocating arrays
+    delete [] x;
+}
+
+void Metropolis::getStatistics()
+{
+    /*
+     * Class instance for sampling statistics from our system.
+     */
+    averagedGamma           = new double[N];
+    averagedGammaSquared    = new double[N];
+    varianceGamma           = new double[N];
+    stdGamma                = new double[N];
+    deltaE                  = new double[N];
+    deltaE_std              = new double[N];
+    for (int i = 0; i < N; i++)
+    {
+        averagedGamma[i]        = 0;
+        averagedGammaSquared[i] = 0;
+        varianceGamma[i]        = 0;
+        stdGamma[i]             = 0;
+        deltaE[i]               = 0;
+        deltaE_std[i]           = 0;
     }
 
     // Performing an average over the Monte Carlo obtained values
@@ -106,33 +140,41 @@ void Metropolis::runMetropolis(const char *filename)
         averagedGammaSquared[n] /= double(NCf);
     }
 
-    // Getting change in energy
+    // Getting change in energy & calculating variance & standard deviation of G
     for (int n = 0; n < N; n++)
     {
+        varianceGamma[n] = (averagedGammaSquared[n] - averagedGamma[n]*averagedGamma[n])/NCf;
+        stdGamma[n] = sqrt(varianceGamma[n]);
         deltaE[n] = log(averagedGamma[n]/averagedGamma[(n+1) % N])/a;
     }
 
-    // Printing the energies in the calculation
+    // Calculating the uncertainty in dE(hand calculation for analytic expression done beforehand)
     for (int n = 0; n < N; n++)
     {
-        cout << deltaE[n] << endl;
+        deltaE_std[n] = sqrt(pow(stdGamma[n]/averagedGamma[n],2) + pow(stdGamma[(n+1)%N]/averagedGamma[(n+1)%N],2))/a;
     }
-
-    // Printing deltaE, variance, standard deviation to file
-    writeStatisticsToFile(filename, deltaE, averagedGamma, averagedGammaSquared, acceptanceCounter);
-
-    printf("Acceptancerate: %f \n", double(acceptanceCounter)/double(NCf*NCor*N));
-
-    // De-allocating arrays
-    for (int i = 0; i < NCf; i++) { delete [] Gamma[i]; }
-    delete [] x;
-    delete [] Gamma;
-    delete [] averagedGamma;
-    delete [] averagedGammaSquared;
-    delete [] deltaE;
 }
 
-void Metropolis::writeStatisticsToFile(const char *filename, double * dE, double * averagedGamma, double * averagedGammaSquared, int acceptanceCounter)
+void Metropolis::writeDataToFile(const char *filename)
+{
+    /*
+     * For writing the raw Gamma data to file.
+     */
+    std::ofstream file;
+    file.open(filename);
+    for (int i = 0; i < NCf; i++)
+    {
+        for (int j = 0; j < N; j++)
+        {
+            file << Gamma[i][j] << " ";
+        }
+        file << endl;
+    }
+    file.close();
+    cout << filename << " written" << endl;
+}
+
+void Metropolis::writeStatisticsToFile(const char *filename)//, double * dE, double * averagedGamma, double * averagedGammaSquared, int acceptanceCounter)
 {
     /*
      * Writes statistics to file about:
@@ -145,30 +187,6 @@ void Metropolis::writeStatisticsToFile(const char *filename, double * dE, double
      * variance:            Var(G)
      * standardDeviation:   std(G)
      */
-    double * variance = new double[N];
-    double * standardDeviation = new double[N];
-    double * dE_std = new double[N];
-    for (int i = 0; i < N; i++)
-    {
-        variance[i] = 0;
-        standardDeviation[i] = 0;
-        dE_std[i] = 0;
-    }
-
-    // Calculating variance and standard deviation of G
-    for (int i = 0; i < N; i++)
-    {
-        variance[i] = (averagedGammaSquared[i] - averagedGamma[i]*averagedGamma[i])/NCf;
-        standardDeviation[i] = sqrt(variance[i]);
-    }
-
-    // Calculating the uncertainty in dE(hand calculation for analytic expression done beforehand)
-    for (int n = 0; n < N; n++)
-    {
-        dE_std[n] = sqrt(pow(standardDeviation[n]/averagedGamma[n],2) + pow(standardDeviation[(n+1)%N]/averagedGamma[(n+1)%N],2))/a;
-    }
-
-    // Initializing file and writing to file
     std::ofstream file;
     file.open(filename);
     file << "acceptanceCounter " << double(acceptanceCounter)/double(N*NCf*NCor) << endl;
@@ -178,17 +196,24 @@ void Metropolis::writeStatisticsToFile(const char *filename, double * dE, double
     for (int n = 0; n < N; n++)
     {
         file << n*a << " "
-             << dE[n] << " "
-             << dE_std[n] << " "
-             << variance[n] << " "
-             << standardDeviation[n] << endl;
+             << deltaE[n] << " "
+             << deltaE_std[n] << " "
+             << varianceGamma[n] << " "
+             << stdGamma[n] << endl;
     }
     file.close();
     cout << filename << " written" << endl;
+}
 
-    delete [] variance;
-    delete [] standardDeviation;
-    delete [] dE_std;
+void Metropolis::printEnergies()
+{
+    /*
+     * Printing the energies in the calculation
+     */
+    for (int n = 0; n < N; n++)
+    {
+        cout << deltaE[n] << endl;
+    }
 }
 
 void printArray(double *x, int N)
