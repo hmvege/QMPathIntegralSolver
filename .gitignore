@@ -17,3 +17,4 @@ build/
 # Junk
 .qmake*
 *.user*
+.DS_Store
