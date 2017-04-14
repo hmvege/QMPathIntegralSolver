@@ -18,8 +18,8 @@ int main()
 {
     double epsilon = 1.4;   // Random interval for picking a new path position to try
     double a = 0.5;         // Lattice spacing
-    int NTherm  = 10;       // Number of times we are to thermalize
-    int N       = 20;       // Points in path at lattice, looking at a 2D lattice, but modelling the possible paths as columns of a matrix
+    int NTherm  = 20;       // Number of times we are to thermalize
+    int N       = 20;       // Points in path at lattice, looking at a 1D lattice, but modelling the possible paths as columns of a matrix
     int NCor    = 20;       // Only keeping every 20th path
     int NCf     = 1e5;      // Number of random path or path configurations
 

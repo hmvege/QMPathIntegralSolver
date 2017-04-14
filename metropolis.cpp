@@ -162,6 +162,10 @@ void Metropolis::writeDataToFile(const char *filename)
      */
     std::ofstream file;
     file.open(filename);
+    file << "acceptanceCounter " << double(acceptanceCounter)/double(N*NCf*NCor) << endl;
+    file << "NCor " << NCor << endl;
+    file << "NCf " << NCf << endl;
+    file << "NTherm " << NTherm << endl;
     for (int i = 0; i < NCf; i++)
     {
         for (int j = 0; j < N; j++)

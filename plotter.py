@@ -1,16 +1,6 @@
 import numpy as np, matplotlib.pyplot as plt, sys
 import multiprocessing, time
 
-# class Bootstrap:
-# 	"""
-# 	Class for creating a bootstrap sample.
-# 	"""
-# 	def __call__(self, N_BS, data, index_lists=[]):
-# 		N = len(data)
-# 		if len(index_lists) == 0: # Allows user to send in a predefined list if needed
-# 			index_lists = np.random.randint(N, size=(N_BS, N))
-# 		return data[index_lists]
-
 def Boot(N_BS, data, index_lists=[]):
 	N = len(data)
 	if len(index_lists) == 0: # Allows user to send in a predefined list if needed
@@ -20,17 +10,18 @@ def Boot(N_BS, data, index_lists=[]):
 def BootParallell(data, index_lists):
 	return data[index_lists]
 
-
 class HOAnalysis:
 	"""
 	Class for analysing the quantum harmonic oscillator solved with the Metropolis algorithm
 	"""
 	def __init__(self, filename, parallel=True, numprocs=4):
 		print "Loading data from %s" % filename
-		self.data = np.transpose(np.loadtxt(filename).astype(float))
+		self.data = np.transpose(np.loadtxt(filename, skiprows=4).astype(float))
 		self.N_data_points, self.N_sample_points = self.data.shape
 		self.parallel = parallel
 		self.numprocs = numprocs
+		self.filename = filename
+		self.load_stats()
 		print "Data loaded"
 
 	def bootstrap(self, N_BS, bootstrap_statistic=lambda x:x):
@@ -45,8 +36,8 @@ class HOAnalysis:
 		pre_time = time.clock()
 		for i in xrange(self.N_data_points):
 			for j in xrange(N_BS):
-				bs[i,j] = bootstrap_statistic(Boot(N_BS,self.data[i],index_lists[j]))
-		# self.bs = bs
+				# bs[i,j] = bootstrap_statistic(Boot(N_BS,self.data[i],index_lists[j]))
+				bs[i,j] = bootstrap_statistic(self.data[i][index_lists[j]])
 		post_time = time.clock()
 		par_time = (post_time - pre_time)
 		print 'bs time: %g' % par_time
@@ -60,7 +51,18 @@ class HOAnalysis:
 		# par_time = (post_time - pre_time)
 		# print 'bs(PARALLEL) time: %g' % par_time
 
+		self.N_BS = N_BS
 		self.bs = bs
+
+	def load_stats(self):
+		file = open("%s" % self.filename)
+		lines = file.readlines()
+		self.acceptanceRate = lines[0].split()[-1]
+		self.NCor = lines[1].split()[-1]
+		self.NCf = lines[2].split()[-1]
+		self.NTherm = lines[3].split()[-1]
+		file.close()
+		return self.acceptanceRate, self.NCor, self.NCf, self.NTherm
 
 	def stats(self, function=lambda x:x):
 		function_data = function(self.bs)
@@ -83,29 +85,32 @@ class HOAnalysis:
 		print "a_err = %.6g, b_err = %.6g" % (errors[0],errors[1])
 
 		y_lim = 1.3
+		plt.figure()
 		plt.plot(x,y)
 		plt.errorbar(np.arange(len(data_fit)),y=data_fit,yerr=data_fit_std,fmt=".")
 		plt.ylim(-y_lim,y_lim)
 		plt.title(r"$f(x) = ax+b, a=%g\pm %.6g, b=%g\pm%.6g$" % (fit[0],errors[0],fit[1],errors[1]))
 		plt.xlabel(r"N")
 		plt.ylabel(r"$\Delta E$")
+		plt.grid()
+		plt.savefig(figure_folder + "%s_linear_fit.png" % self.filename.split('.')[0],dpi=300)
 
 	def plot_data(self, x=None):
 		if not x: x = np.arange(self.N_data_points)
+		plt.figure()
 		plt.errorbar(x,y=self.deltaE,yerr=self.deltaE_std,fmt="-o",ecolor="r",color="0")
-		plt.title(r"MC acceptance rate: $%1.3f%%$, $N_{Cor}=%g$, $N_{Cf}=%g$, $N_{Therm}=%g$" % (float(acceptanceRate),int(NCor),int(NCf),int(NTherm)),fontsize=17)
+		plt.title(r"$N_{Cor}=%g$, $N_{Cf}=%g$, $N_{Therm}=%g$, $N_{Boot}=%g$" % (int(self.NCor),int(self.NCf),int(self.NTherm),self.N_BS),fontsize=17)
 		plt.xlabel(r"$t$",fontsize="18")
 		plt.ylabel(r"$\Delta E$",fontsize="18")
 		plt.grid()
-		plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
+		plt.savefig(figure_folder + "%s.png" % self.filename.split('.')[0],dpi=300)
 
 def energy(g):
 	a = 0.5
 	return np.log(g/np.roll(g,-1,axis=0))/a
 
 def gf1(figure_folder, filename):
-	data = np.loadtxt("%s" % filename,skiprows=4)
-
+	data = np.loadtxt("%s" % filename, skiprows=4)
 	file = open("%s" % filename)
 	lines = file.readlines()
 	acceptanceRate = lines[0].split()[-1]
@@ -113,6 +118,7 @@ def gf1(figure_folder, filename):
 	NCf = lines[2].split()[-1]
 	NTherm = lines[3].split()[-1]
 
+	file.close()
 	plt.errorbar(data[:,0],data[:,1],(data[:,2]),fmt="-o",ecolor="r",color="0")
 	plt.title(r"MC acceptance rate: $%1.3f%%$, $N_{Cor}=%g$, $N_{Cf}=%g$, $N_{Therm}=%g$" % (float(acceptanceRate),int(NCor),int(NCf),int(NTherm)),fontsize=17)
 	plt.xlabel(r"$t$",fontsize="18")
@@ -121,14 +127,14 @@ def gf1(figure_folder, filename):
 	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
 
 def gf2(figure_folder, filename):
-	data = np.loadtxt("%s" % filename,skiprows=4)
-
+	data = np.loadtxt("%s" % filename, skiprows=4)
 	file = open("%s" % filename)
 	lines = file.readlines()
 	acceptanceRate = lines[0].split()[-1]
 	NCor = lines[1].split()[-1]
 	NCf = lines[2].split()[-1]
 	NTherm = lines[3].split()[-1]
+	file.close()
 
 	plt.figure()
 	plt.errorbar(data[:,0],data[:,1],(data[:,2]),fmt="-o",ecolor="r",color="0")
@@ -140,10 +146,11 @@ def gf2(figure_folder, filename):
 
 if __name__ == '__main__':
 	figure_folder = "figures/"
-	# gf1(figure_folder, "gammaFunctional_stats.txt")
-	# gf2(figure_folder, "gammaFunctional_stats2.txt")
+	gf1(figure_folder, "gammaFunctional_stats.txt")
+	gf2(figure_folder, "gammaFunctional_stats2.txt")
 	G1Analysis = HOAnalysis("gammaFunctional_gamma.txt")
 	G1Analysis.bootstrap(int(1e4),np.mean)
 	G1Analysis.stats(energy)
 	G1Analysis.fit_data()
-	plt.show()
+	G1Analysis.plot_data()
+	# plt.show()
