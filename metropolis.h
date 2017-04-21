@@ -24,6 +24,8 @@ private:
     double * averagedGammaSquared;
     double * deltaE;
 
+    long seed = -1;
+
     // Storing the action as a pointer
     Action *S = nullptr;
 

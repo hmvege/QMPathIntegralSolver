@@ -12,6 +12,41 @@ using std::cout;
 using std::endl;
 void printArray(double *x, int N);
 
+
+
+#define IA 16807
+#define IM 2147483647
+#define AM (1.0/IM)
+#define IQ 127773
+#define IR 2836
+#define MASK 123459876
+
+double ran0(long *idum)
+{
+   long     k;
+   double   ans;
+
+   *idum ^= MASK;
+   k = (*idum)/IQ;
+   *idum = IA*(*idum - k*IQ) - IR*k;
+   if(*idum < 0) *idum += IM;
+   ans=AM*(*idum);
+   *idum ^= MASK;
+   return ans;
+}
+#undef IA
+#undef IM
+#undef AM
+#undef IQ
+#undef IR
+#undef MASK
+
+#include <cstdio>
+#include <cstdlib>
+
+
+
+
 Metropolis::Metropolis(int new_N, int new_NCf, int new_NCor, int new_Therm, double new_epsilon, double new_a)
 {
     /*
@@ -75,7 +110,7 @@ void Metropolis::update(double *x,
 }
 
 double Metropolis::random(double min, double max){ // Giovanni
-    return min + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(max-min)));
+    return min + ran0(&seed) * (max-min);
 }
 
 void Metropolis::runMetropolis()
@@ -239,6 +274,6 @@ void printArray(double *x, int N)
 {
     for (int i = 0; i < N; i++)
     {
-        printf("%.2f \n", x[i]);
+        printf("%.10f \n", x[i]);
     }
 }
