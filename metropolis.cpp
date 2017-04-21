@@ -6,6 +6,8 @@
 #include "metropolis.h"
 #include "action.h"
 
+#include <cstdlib> // Giovanni method
+
 using std::cout;
 using std::endl;
 void printArray(double *x, int N);
@@ -50,10 +52,16 @@ void Metropolis::update(double *x,
     {
         double x_prev = x[i];
         double oldS = S->getAction(x, i);
-        x[i] += epsilon_distribution(gen); // setting a new possible x-position to test for
+//        x[i] += epsilon_distribution(gen); // setting a new possible x-position to test for
+
+        double rand_x = random(-epsilon,epsilon);
+//        cout << rand_x << endl;
+        x[i] += rand_x;
+
         double deltaS = S->getAction(x, i) - oldS;
 
-        if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
+//        if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
+        if ((deltaS > 0) && (exp(-deltaS) < random(0,1)))
         {
             x[i] = x_prev;
         }
@@ -62,6 +70,12 @@ void Metropolis::update(double *x,
             acceptanceCounter++;
         }
     }
+//    printArray(x,N);
+//    cout << endl;
+}
+
+double Metropolis::random(double min, double max){ // Giovanni
+    return min + static_cast <double> (rand()) /( static_cast <double> (RAND_MAX/(max-min)));
 }
 
 void Metropolis::runMetropolis()
@@ -137,6 +151,7 @@ void Metropolis::getStatistics()
             averagedGammaSquared[n] += Gamma[alpha][n]*Gamma[alpha][n];
         }
         averagedGamma[n] /= double(NCf);
+//        cout << "averagedGamma[" << n << "] = " << averagedGamma[n] << endl;
         averagedGammaSquared[n] /= double(NCf);
     }
 

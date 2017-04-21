@@ -40,6 +40,8 @@ public:
     void writeStatisticsToFile(const char *filename);
     void writeDataToFile(const char *filename);
 
+    double random(double min, double max);
+
     // Setters
     void setAction(Action *newS) { S = newS; }
     void setGammaFunctional(double (*newGammaFunctional)(double * x, int n, int _N)) { gammaFunctional = newGammaFunctional; }

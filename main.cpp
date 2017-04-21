@@ -18,11 +18,11 @@ int main()
 {
     double epsilon = 1.4;   // Random interval for picking a new path position to try
     double a = 0.5;         // Lattice spacing
-    int NTherm  = 20;       // Number of times we are to thermalize
+    int NTherm  = 10;       // Number of times we are to thermalize, that is NTherm * NCor
     int N       = 20;       // Points in path at lattice, looking at a 1D lattice, but modelling the possible paths as columns of a matrix
     int NCor    = 20;       // Only keeping every 20th path
     int NCf     = 1e5;      // Number of random path or path configurations
-
+    srand(-1);
     Action S(N,a);
     S.setPotential(potential);
 
@@ -37,13 +37,13 @@ int main()
     metropolis.writeStatisticsToFile("gammaFunctional_stats.txt");
     metropolis.printEnergies();
 
-    // Using gammaFunctional2
-    metropolis.setGammaFunctional(&gammaFunctional2);
-    metropolis.runMetropolis();
-    metropolis.getStatistics();
-    metropolis.writeDataToFile("gammaFunctional2_gamma.txt");
-    metropolis.writeStatisticsToFile("gammaFunctional2_stats.txt");
-    metropolis.printEnergies();
+//    // Using gammaFunctional2
+//    metropolis.setGammaFunctional(&gammaFunctional2);
+//    metropolis.runMetropolis();
+//    metropolis.getStatistics();
+//    metropolis.writeDataToFile("gammaFunctional2_gamma.txt");
+//    metropolis.writeStatisticsToFile("gammaFunctional2_stats.txt");
+//    metropolis.printEnergies();
 
     cout << "Program finished." << endl;
     return 0;
@@ -59,6 +59,9 @@ double potential(double x)
 
 double gammaFunctional(double * x, int n, int N)
 {
+    /*
+     * For exercise with x(i+1)*x(i)
+     */
     double G = 0;
     for (int i = 0; i < N; i++)
     {
@@ -69,6 +72,9 @@ double gammaFunctional(double * x, int n, int N)
 
 double gammaFunctional2(double *x, int n, int N)
 {
+    /*
+     * For exercise with x(i+1)^3*x(i)^3
+     */
     double G = 0;
     for (int i = 0; i < N; i++)
     {
