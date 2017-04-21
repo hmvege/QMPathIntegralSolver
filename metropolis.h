@@ -4,6 +4,8 @@
 #include <random>
 #include "action.h"
 
+#include <ctime>
+
 class Metropolis
 {
 private:
@@ -24,7 +26,7 @@ private:
     double * averagedGammaSquared;
     double * deltaE;
 
-    long seed = -1;
+    long seed = std::time(nullptr);
 
     // Storing the action as a pointer
     Action *S = nullptr;

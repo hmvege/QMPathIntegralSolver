@@ -96,9 +96,14 @@ void Metropolis::update(double *x,
         double deltaS = S->getAction(x, i) - oldS;
 
 //        if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
-        if ((deltaS > 0) && (exp(-deltaS) < random(0,1)))
+//        if ((deltaS > 0) && (exp(-deltaS) < random(0,1)))
+        if (deltaS > 0)
         {
-            x[i] = x_prev;
+            if (exp(-deltaS) < random(0,1))
+            {
+                x[i] = x_prev;
+            }
+//            x[i] = x_prev;
         }
         else
         {
@@ -133,6 +138,7 @@ void Metropolis::runMetropolis()
     for (int i = 0; i < NTherm * NCor; i++)
     {
         update(x, generator, epsilon_distribution, uniform_distribution);
+//        cout << random(0,1) << endl;
     }
 
     // Setting the Metropolis acceptance counter to 0 in order not to count the thermalization
@@ -144,6 +150,7 @@ void Metropolis::runMetropolis()
         for (int i = 0; i < NCor; i++) // Updating NCor times before updating the Gamma function
         {
             update(x, generator, epsilon_distribution, uniform_distribution);
+//            cout << random(0,1) << endl;
         }
         for (int n = 0; n < N; n++)
         {
@@ -185,8 +192,8 @@ void Metropolis::getStatistics()
             averagedGamma[n] += Gamma[alpha][n];
             averagedGammaSquared[n] += Gamma[alpha][n]*Gamma[alpha][n];
         }
+        cout << "averagedGamma[" << n << "] = " << averagedGamma[n] << endl;
         averagedGamma[n] /= double(NCf);
-//        cout << "averagedGamma[" << n << "] = " << averagedGamma[n] << endl;
         averagedGammaSquared[n] /= double(NCf);
     }
 
