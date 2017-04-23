@@ -26,8 +26,6 @@ private:
     double * averagedGammaSquared;
     double * deltaE;
 
-    long seed = std::time(nullptr);
-
     // Storing the action as a pointer
     Action *S = nullptr;
 
@@ -43,8 +41,6 @@ public:
     void getStatistics();
     void writeStatisticsToFile(const char *filename);
     void writeDataToFile(const char *filename);
-
-    double random(double min, double max);
 
     // Setters
     void setAction(Action *newS) { S = newS; }

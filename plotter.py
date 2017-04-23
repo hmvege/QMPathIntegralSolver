@@ -54,12 +54,12 @@ class HOAnalysis:
 	def fit_data(self, n_fit=5):
 		data_fit = np.concatenate([-self.deltaE[-n_fit:-1],self.deltaE[:n_fit]])
 		data_fit_std = np.concatenate([self.deltaE_std[-n_fit:-1],self.deltaE_std[:n_fit]])
-		data_points = np.arange(len(data_fit))
+		data_points = np.arange(-len(data_fit)/2.,len(data_fit)/2.)
 
 		fit, cov = np.polyfit(data_points, data_fit, 1, cov=True, w=1.0/data_fit_std)
 		errors = np.sqrt(np.diag(cov)) # Calculating errors from the covariance matrix
-		
-		x = np.linspace(0,n_fit*2,100)
+
+		x = np.linspace(-len(data_fit)/2.,len(data_fit)/2.,100)
 		y = np.polyval(fit,x)
 
 		print "a = %g, b = %g" % (fit[0], fit[1])
@@ -68,7 +68,7 @@ class HOAnalysis:
 		y_lim = 1.3
 		plt.figure()
 		plt.plot(x,y)
-		plt.errorbar(np.arange(len(data_fit)), y=data_fit, yerr=data_fit_std, fmt=".")
+		plt.errorbar(data_points, y=data_fit, yerr=data_fit_std, fmt=".")
 		plt.ylim(-y_lim,y_lim)
 		plt.title(r"$f(x) = ax+b, a=%g\pm %.6g, b=%g\pm%.6g$" % (fit[0], errors[0], fit[1], errors[1]))
 		plt.xlabel(r"N")

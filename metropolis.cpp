@@ -6,46 +6,9 @@
 #include "metropolis.h"
 #include "action.h"
 
-#include <cstdlib> // Giovanni method
-
 using std::cout;
 using std::endl;
 void printArray(double *x, int N);
-
-
-
-#define IA 16807
-#define IM 2147483647
-#define AM (1.0/IM)
-#define IQ 127773
-#define IR 2836
-#define MASK 123459876
-
-double ran0(long *idum)
-{
-   long     k;
-   double   ans;
-
-   *idum ^= MASK;
-   k = (*idum)/IQ;
-   *idum = IA*(*idum - k*IQ) - IR*k;
-   if(*idum < 0) *idum += IM;
-   ans=AM*(*idum);
-   *idum ^= MASK;
-   return ans;
-}
-#undef IA
-#undef IM
-#undef AM
-#undef IQ
-#undef IR
-#undef MASK
-
-#include <cstdio>
-#include <cstdlib>
-
-
-
 
 Metropolis::Metropolis(int new_N, int new_NCf, int new_NCor, int new_Therm, double new_epsilon, double new_a)
 {
@@ -87,35 +50,17 @@ void Metropolis::update(double *x,
     {
         double x_prev = x[i];
         double oldS = S->getAction(x, i);
-//        x[i] += epsilon_distribution(gen); // setting a new possible x-position to test for
-
-        double rand_x = random(-epsilon,epsilon);
-//        cout << rand_x << endl;
-        x[i] += rand_x;
-
+        x[i] += epsilon_distribution(gen); // setting a new possible x-position to test for
         double deltaS = S->getAction(x, i) - oldS;
-
-//        if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
-//        if ((deltaS > 0) && (exp(-deltaS) < random(0,1)))
-        if (deltaS > 0)
+        if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
         {
-            if (exp(-deltaS) < random(0,1))
-            {
-                x[i] = x_prev;
-            }
-//            x[i] = x_prev;
+            x[i] = x_prev;
         }
         else
         {
             acceptanceCounter++;
         }
     }
-//    printArray(x,N);
-//    cout << endl;
-}
-
-double Metropolis::random(double min, double max){ // Giovanni
-    return min + ran0(&seed) * (max-min);
 }
 
 void Metropolis::runMetropolis()
@@ -138,7 +83,6 @@ void Metropolis::runMetropolis()
     for (int i = 0; i < NTherm * NCor; i++)
     {
         update(x, generator, epsilon_distribution, uniform_distribution);
-//        cout << random(0,1) << endl;
     }
 
     // Setting the Metropolis acceptance counter to 0 in order not to count the thermalization
@@ -150,7 +94,6 @@ void Metropolis::runMetropolis()
         for (int i = 0; i < NCor; i++) // Updating NCor times before updating the Gamma function
         {
             update(x, generator, epsilon_distribution, uniform_distribution);
-//            cout << random(0,1) << endl;
         }
         for (int n = 0; n < N; n++)
         {
@@ -192,7 +135,6 @@ void Metropolis::getStatistics()
             averagedGamma[n] += Gamma[alpha][n];
             averagedGammaSquared[n] += Gamma[alpha][n]*Gamma[alpha][n];
         }
-        cout << "averagedGamma[" << n << "] = " << averagedGamma[n] << endl;
         averagedGamma[n] /= double(NCf);
         averagedGammaSquared[n] /= double(NCf);
     }

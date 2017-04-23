@@ -21,7 +21,7 @@ int main()
     int NTherm  = 10;       // Number of times we are to thermalize, that is NTherm * NCor
     int N       = 20;       // Points in path at lattice, looking at a 1D lattice, but modelling the possible paths as columns of a matrix
     int NCor    = 20;       // Only keeping every 20th path
-    int NCf     = 1e4;      // Number of random path or path configurations
+    int NCf     = 1e6;      // Number of random path or path configurations
     Action S(N,a);
     S.setPotential(potential);
 
