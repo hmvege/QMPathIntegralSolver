@@ -35,6 +35,20 @@ class HOAnalysis:
 		self.N_BS = N_BS
 		self.bs = bs
 
+	def bin(self,N_bins):
+		"""
+		Args:
+			N_bins: size of the bootstrap averages
+		"""
+		bs_averaged = np.zeros((self.N_data_points),int(self.N_BS/N_bins))
+		for n in xrange(self.N_data_points):
+			for i in xrange(0,self.N_BS,N_bins):
+				for j in xrange(0,N_bins):
+					bs_averaged[n,i] = self.bs[n,i+j]
+				bs_averaged[n,i] =/ float(N_bins)
+		print "Binning complete"
+		self.bs = bs_averaged
+
 	def load_stats(self):
 		file = open("%s" % self.filename)
 		lines = file.readlines()
@@ -141,6 +155,7 @@ if __name__ == '__main__':
 	gf2(figure_folder, "gammaFunctional_stats2.txt")
 	G1Analysis = HOAnalysis("gammaFunctional_gamma.txt")
 	G1Analysis.bootstrap(int(1e2)*5,np.mean)
+	# G1Analysis.bin(10)
 	G1Analysis.stats(energy)
 	G1Analysis.fit_data()
 	G1Analysis.plot_data()

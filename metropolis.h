@@ -6,6 +6,8 @@
 
 #include <ctime>
 
+class Action;
+
 class Metropolis
 {
 private:

@@ -1,7 +1,6 @@
 #ifndef ACTION_H
 #define ACTION_H
 
-
 class Action
 {
 private:
@@ -10,8 +9,9 @@ private:
     int N;
 public:
     Action(int NPathPoints, double new_a);
-    double getAction(double * x, int i);
-
+    virtual ~Action() {}
+    virtual double getAction(double * x, int i);
+    // Sets the potential
     void setPotential(double (*pot)(double x)) { potential = pot; }
 };
 

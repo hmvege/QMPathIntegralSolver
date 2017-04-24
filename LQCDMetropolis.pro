@@ -6,7 +6,8 @@ CONFIG -= qt
 SOURCES += main.cpp \
     metropolis.cpp \
     action.cpp \
-    random.cpp
+    random.cpp \
+    impaction.cpp
 
 ## MPI Settings, uncommented for mac
 #QMAKE_CXX = mpicxx
@@ -23,5 +24,6 @@ SOURCES += main.cpp \
 HEADERS += \
     metropolis.h \
     action.h \
-    random.h
+    random.h \
+    impaction.h
 

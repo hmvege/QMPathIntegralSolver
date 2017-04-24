@@ -6,6 +6,7 @@
 #include <ctime> // For random seed
 #include "metropolis.h"
 #include "action.h"
+#include "impaction.h"
 //#include <mpi.h> // For parallelization later
 
 using namespace std;
@@ -21,20 +22,21 @@ int main()
     int NTherm  = 10;       // Number of times we are to thermalize, that is NTherm * NCor
     int N       = 20;       // Points in path at lattice, looking at a 1D lattice, but modelling the possible paths as columns of a matrix
     int NCor    = 20;       // Only keeping every 20th path
-    int NCf     = 1e6;      // Number of random path or path configurations
+    int NCf     = 1e5;      // Number of random path or path configurations
+
     Action S(N,a);
     S.setPotential(potential);
 
     Metropolis metropolis(N, NCf, NCor, NTherm, epsilon, a);
     metropolis.setAction(&S);
 
-    // Using gammaFunctional
-    metropolis.setGammaFunctional(&gammaFunctional);
-    metropolis.runMetropolis();
-    metropolis.getStatistics();
-    metropolis.writeDataToFile("gammaFunctional_gamma.txt");
-    metropolis.writeStatisticsToFile("gammaFunctional_stats.txt");
-    metropolis.printEnergies();
+//    // Using gammaFunctional
+//    metropolis.setGammaFunctional(&gammaFunctional);
+//    metropolis.runMetropolis();
+//    metropolis.getStatistics();
+//    metropolis.writeDataToFile("gammaFunctional_gamma.txt");
+//    metropolis.writeStatisticsToFile("gammaFunctional_stats.txt");
+//    metropolis.printEnergies();
 
 //    // Using gammaFunctional2
 //    metropolis.setGammaFunctional(&gammaFunctional2);
@@ -43,6 +45,19 @@ int main()
 //    metropolis.writeDataToFile("gammaFunctional2_gamma.txt");
 //    metropolis.writeStatisticsToFile("gammaFunctional2_stats.txt");
 //    metropolis.printEnergies();
+
+    // Using improved action
+//    double m = 1.0;         // Mass
+//    ImpAction SImp(N,a,m);
+//    SImp.setPotential(potential);
+//    metropolis.setAction(&S);
+//    metropolis.setGammaFunctional(&gammaFunctional);
+//    metropolis.runMetropolis();
+//    metropolis.getStatistics();
+//    metropolis.writeDataToFile("improvedAction_gamma.txt");
+//    metropolis.writeStatisticsToFile("improvedAction_stats.txt");
+//    metropolis.printEnergies();
+
 
     cout << "Program finished." << endl;
     return 0;
