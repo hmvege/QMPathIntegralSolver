@@ -4,7 +4,7 @@
 #include <fstream>
 #include <iostream>
 #include "metropolis.h"
-#include "action.h"
+#include "actions/action.h"
 
 using std::cout;
 using std::endl;
@@ -16,8 +16,8 @@ Metropolis::Metropolis(int new_N, int new_NCf, int new_NCor, int new_Therm, doub
      * Class for calculating correlators using the Metropolis algorithm.
      * Takes an action object as well as a Gamma functional to be used in the action.
      */
-    N = new_N;
-    NCf = new_NCf;
+    N = new_N; // Lattice sites
+    NCf = new_NCf; // Number of configurations to run for
     NCor = new_NCor;
     NTherm = new_Therm;
     epsilon = new_epsilon;
@@ -100,7 +100,6 @@ void Metropolis::runMetropolis()
             Gamma[alpha][n] = gammaFunctional(x,n,N);
         }
     }
-    printf("Acceptancerate: %f \n", double(acceptanceCounter)/double(NCf*NCor*N));
 
     // De-allocating arrays
     delete [] x;
@@ -217,6 +216,11 @@ void Metropolis::printEnergies()
     {
         cout << deltaE[n] << endl;
     }
+}
+
+void Metropolis::printAcceptanceRate()
+{
+    printf("Acceptancerate: %f \n", double(acceptanceCounter)/double(NCf*NCor*N));
 }
 
 void printArray(double *x, int N)

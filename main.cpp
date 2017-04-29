@@ -5,8 +5,8 @@
 #include <random> // For Mersenne-Twister19937
 #include <ctime> // For random seed
 #include "metropolis.h"
-#include "action.h"
-#include "impaction.h"
+#include "actions/action.h"
+#include "actions/impaction.h"
 //#include <mpi.h> // For parallelization later
 
 using namespace std;
@@ -17,6 +17,9 @@ double gammaFunctional2(double *x, int n, int N);
 
 int main()
 {
+    clock_t programStart, programEnd; // Clocking for fun
+    programStart = clock();
+
     double epsilon = 1.4;   // Random interval for picking a new path position to try
     double a = 0.5;         // Lattice spacing
     int NTherm  = 10;       // Number of times we are to thermalize, that is NTherm * NCor
@@ -34,32 +37,35 @@ int main()
 //    metropolis.setGammaFunctional(&gammaFunctional);
 //    metropolis.runMetropolis();
 //    metropolis.getStatistics();
-//    metropolis.writeDataToFile("gammaFunctional_gamma.txt");
-//    metropolis.writeStatisticsToFile("gammaFunctional_stats.txt");
+//    metropolis.writeDataToFile("output/gammaFunctional_gamma.txt");
+//    metropolis.writeStatisticsToFile("output/gammaFunctional_stats.txt");
 //    metropolis.printEnergies();
+//    metropolis.printAcceptanceRate();
 
 //    // Using gammaFunctional2
 //    metropolis.setGammaFunctional(&gammaFunctional2);
 //    metropolis.runMetropolis();
 //    metropolis.getStatistics();
-//    metropolis.writeDataToFile("gammaFunctional2_gamma.txt");
-//    metropolis.writeStatisticsToFile("gammaFunctional2_stats.txt");
+//    metropolis.writeDataToFile("output/gammaFunctional2_gamma.txt");
+//    metropolis.writeStatisticsToFile("output/gammaFunctional2_stats.txt");
 //    metropolis.printEnergies();
+//    metropolis.printAcceptanceRate();
 
     // Using improved action
-//    double m = 1.0;         // Mass
-//    ImpAction SImp(N,a,m);
-//    SImp.setPotential(potential);
-//    metropolis.setAction(&S);
-//    metropolis.setGammaFunctional(&gammaFunctional);
-//    metropolis.runMetropolis();
-//    metropolis.getStatistics();
-//    metropolis.writeDataToFile("improvedAction_gamma.txt");
-//    metropolis.writeStatisticsToFile("improvedAction_stats.txt");
-//    metropolis.printEnergies();
+    double m = 1.0;         // Mass
+    ImpAction SImp(N,a,m);
+    SImp.setPotential(potential);
+    metropolis.setAction(&SImp);
+    metropolis.setGammaFunctional(&gammaFunctional);
+    metropolis.runMetropolis();
+    metropolis.getStatistics();
+    metropolis.writeDataToFile("output/improvedAction_gamma.txt");
+    metropolis.writeStatisticsToFile("output/improvedAction_stats.txt");
+    metropolis.printEnergies();
+    metropolis.printAcceptanceRate();
 
-
-    cout << "Program finished." << endl;
+    programEnd = clock();
+    cout << "Program complete. Time used: " << ((programEnd - programStart)/((double)CLOCKS_PER_SEC)) << endl;
     return 0;
 }
 

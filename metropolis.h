@@ -2,9 +2,7 @@
 #define METROPOLIS_H
 
 #include <random>
-#include "action.h"
-
-#include <ctime>
+#include "actions/action.h"
 
 class Action;
 
@@ -58,6 +56,7 @@ public:
 
     // Printers
     void printEnergies();
+    void printAcceptanceRate();
 };
 
 #endif // METROPOLIS_H

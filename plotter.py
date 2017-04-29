@@ -5,9 +5,10 @@ class HOAnalysis:
 	"""
 	Class for analysing the quantum harmonic oscillator solved with the Metropolis algorithm
 	"""
-	def __init__(self, filename, parallel=True, numprocs=4):
+	def __init__(self, filename, output_folder, parallel=True, numprocs=4):
 		print "Loading data from %s" % filename
-		self.data = np.transpose(np.loadtxt(filename, skiprows=4).astype(float))
+		self.data = np.transpose(np.loadtxt(output_folder + filename, skiprows=4).astype(float))
+		self.output_folder = output_folder
 		self.N_data_points, self.N_sample_points = self.data.shape
 		self.parallel = parallel
 		self.numprocs = numprocs
@@ -45,12 +46,12 @@ class HOAnalysis:
 			for i in xrange(0,self.N_BS,N_bins):
 				for j in xrange(0,N_bins):
 					bs_averaged[n,i] = self.bs[n,i+j]
-				bs_averaged[n,i] =/ float(N_bins)
+				bs_averaged[n,i] /= float(N_bins)
 		print "Binning complete"
 		self.bs = bs_averaged
 
 	def load_stats(self):
-		file = open("%s" % self.filename)
+		file = open(self.output_folder + "%s" % self.filename)
 		lines = file.readlines()
 		self.acceptanceRate = float(lines[0].split()[-1])
 		self.NCor = int(lines[1].split()[-1])
@@ -114,50 +115,43 @@ def energy(g):
 	a = 0.5
 	return np.log(g/np.roll(g,-1,axis=0))/a
 
-def gf1(figure_folder, filename):
-	data = np.loadtxt("%s" % filename, skiprows=4)
-	file = open("%s" % filename)
+def gf_plot(figure_folder, output_folder, filename, plot_range=[0,-1]):
+	data = np.loadtxt(output_folder + "%s" % filename, skiprows=4)
+	file = open(output_folder + "%s" % filename)
 	lines = file.readlines()
 	acceptanceRate = float(lines[0].split()[-1])
 	NCor = int(lines[1].split()[-1])
 	NCf = int(lines[2].split()[-1])
 	NTherm = int(lines[3].split()[-1])
-
-	file.close()
-	plt.errorbar(data[:,0],data[:,1],(data[:,2]),fmt="-o",ecolor="r",color="0")
-	plt.title(r"MC acceptance rate: $%1.3f%%$, $N_C=%g$, $N_{Cf}=%g$, $N_{Therm}=%g$" % (acceptanceRate,NCor,NCf,NTherm*NCor),fontsize=17)
-	plt.xlabel(r"$t$",fontsize="18")
-	plt.ylabel(r"$\Delta E$",fontsize="18")
-	plt.grid()
-	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
-
-def gf2(figure_folder, filename):
-	data = np.loadtxt("%s" % filename, skiprows=4)
-	file = open("%s" % filename)
-	lines = file.readlines()
-	acceptanceRate = float(lines[0].split()[-1])
-	NCor = int(lines[1].split()[-1])
-	NCf = int(lines[2].split()[-1])
-	NTherm = int(lines[3].split()[-1])
-
 	file.close()
 	plt.figure()
-	plt.errorbar(data[:,0],data[:,1],(data[:,2]),fmt="-o",ecolor="r",color="0")
+	plt.errorbar(	data[plot_range[0]:plot_range[-1],0],
+					y 		= data[plot_range[0]:plot_range[-1],1],
+					yerr	= (data[plot_range[0]:plot_range[-1],2]),
+					fmt		= "-o",
+					ecolor	= "r",
+					color	= "0")
 	plt.title(r"MC acceptance rate: $%1.3f%%$, $N_C=%g$, $N_{Cf}=%g$, $N_{Therm}=%g$" % (acceptanceRate,NCor,NCf,NTherm*NCor),fontsize=17)
 	plt.xlabel(r"$t$",fontsize="18")
 	plt.ylabel(r"$\Delta E$",fontsize="18")
 	plt.grid()
 	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
+	print figure_folder + "%s.png" % filename.split('.')[0], "figure created"
 
-if __name__ == '__main__':
-	figure_folder = "figures/"
-	gf1(figure_folder, "gammaFunctional_stats.txt")
-	gf2(figure_folder, "gammaFunctional_stats2.txt")
-	G1Analysis = HOAnalysis("gammaFunctional_gamma.txt")
+def run_G1Analysis():
+	G1Analysis = HOAnalysis("gammaFunctional_gamma.txt", output_folder)
 	G1Analysis.bootstrap(int(1e2)*5,np.mean)
 	# G1Analysis.bin(10)
 	G1Analysis.stats(energy)
 	G1Analysis.fit_data()
 	G1Analysis.plot_data()
 	G1Analysis.write_bs_data("bootstrapped_data.txt")
+
+if __name__ == '__main__':
+	figure_folder = "figures/"
+	output_folder = "output/"
+	# gf_plot(figure_folder, output_folder, "gammaFunctional_stats.txt")
+	# gf_plot(figure_folder, output_folder, "gammaFunctional_stats2.txt")
+	gf_plot(figure_folder, output_folder, "improvedAction_stats.txt",plot_range=[0,5])
+	# run_G1Analysis()
 	plt.show()
