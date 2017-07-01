@@ -33,14 +33,14 @@ int main()
     Metropolis metropolis(N, NCf, NCor, NTherm, epsilon, a);
     metropolis.setAction(&S);
 
-//    // Using gammaFunctional
-//    metropolis.setGammaFunctional(&gammaFunctional);
-//    metropolis.runMetropolis();
-//    metropolis.getStatistics();
-//    metropolis.writeDataToFile("output/gammaFunctional_gamma.txt");
-//    metropolis.writeStatisticsToFile("output/gammaFunctional_stats.txt");
-//    metropolis.printEnergies();
-//    metropolis.printAcceptanceRate();
+    // Using gammaFunctional
+    metropolis.setGammaFunctional(&gammaFunctional);
+    metropolis.runMetropolis();
+    metropolis.getStatistics();
+    metropolis.writeDataToFile("output/gammaFunctional_gamma.txt");
+    metropolis.writeStatisticsToFile("output/gammaFunctional_stats.txt");
+    metropolis.printEnergies();
+    metropolis.printAcceptanceRate();
 
 //    // Using gammaFunctional2
 //    metropolis.setGammaFunctional(&gammaFunctional2);

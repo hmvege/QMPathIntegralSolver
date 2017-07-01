@@ -150,8 +150,8 @@ def run_G1Analysis():
 if __name__ == '__main__':
 	figure_folder = "figures/"
 	output_folder = "output/"
-	# gf_plot(figure_folder, output_folder, "gammaFunctional_stats.txt")
+	gf_plot(figure_folder, output_folder, "gammaFunctional_stats.txt")
 	# gf_plot(figure_folder, output_folder, "gammaFunctional_stats2.txt")
 	gf_plot(figure_folder, output_folder, "improvedAction_stats.txt",plot_range=[0,5])
-	# run_G1Analysis()
+	run_G1Analysis()
 	plt.show()
