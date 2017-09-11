@@ -55,9 +55,6 @@ void Metropolis::update(double *x,
         if ((deltaS > 0) && (exp(-deltaS) < uniform_distribution(gen)))
         {
             x[i] = x_prev;
-        }
-        else
-        {
             acceptanceCounter++;
         }
     }
