@@ -4,16 +4,16 @@
 #include <iomanip>
 #include <random> // For Mersenne-Twister19937
 #include <ctime> // For random seed
-#include "metropolis.h"
+
+#include "system.h"
 #include "actions/action.h"
 #include "actions/impaction.h"
+#include "observables/correlatorx1.h"
+#include "observables/correlatorx3.h"
+#include "potentials/harmonicoscillator.h"
 //#include <mpi.h> // For parallelization later
 
 using namespace std;
-
-double potential(double x);
-double gammaFunctional(double * x, int n, int N);
-double gammaFunctional2(double *x, int n, int N);
 
 int main()
 {
@@ -27,78 +27,54 @@ int main()
     int NCor    = 20;       // Only keeping every 20th path
     int NCf     = 1e5;      // Number of random path or path configurations
 
-    Action S(N,a);
-    S.setPotential(potential);
+    // Sets the potential
+    HarmonicOscillator HOPotential;
 
-    Metropolis metropolis(N, NCf, NCor, NTherm, epsilon, a);
-    metropolis.setAction(&S);
+    // Sets the action with potential
+    Action S(N,a);
+    S.setPotential(&HOPotential);
+
+    // Initialise the observable/correlator
+    CorrelatorX1 x1Correlator(N);
+    CorrelatorX3 x3Correlator(N);
+
+    System system(N, NCf, NCor, NTherm, epsilon, a);
+    system.setAction(&S);
+
+
 
     // Using gammaFunctional
-    metropolis.setGammaFunctional(&gammaFunctional);
-    metropolis.runMetropolis();
-    metropolis.getStatistics();
-    metropolis.writeDataToFile("output/gammaFunctional_gamma.txt");
-    metropolis.writeStatisticsToFile("output/gammaFunctional_stats.txt");
-    metropolis.printEnergies();
-    metropolis.printAcceptanceRate();
-
+    system.setGammaFunctional(&x1Correlator);
+    system.run();
+    system.getStatistics();
+    system.writeDataToFile("output/gammaFunctional_gamma.txt");
+    system.writeStatisticsToFile("output/gammaFunctional_stats.txt");
+    system.printEnergies();
+    system.printAcceptanceRate();
+    exit(1);
 //    // Using gammaFunctional2
-//    metropolis.setGammaFunctional(&gammaFunctional2);
-//    metropolis.runMetropolis();
-//    metropolis.getStatistics();
-//    metropolis.writeDataToFile("output/gammaFunctional2_gamma.txt");
-//    metropolis.writeStatisticsToFile("output/gammaFunctional2_stats.txt");
-//    metropolis.printEnergies();
-//    metropolis.printAcceptanceRate();
+//    system.setGammaFunctional(&x3Correlator);
+//    system.run();
+//    system.getStatistics();
+//    system.writeDataToFile("output/gammaFunctional2_gamma.txt");
+//    system.writeStatisticsToFile("output/gammaFunctional2_stats.txt");
+//    system.printEnergies();
+//    system.printAcceptanceRate();
 
     // Using improved action
     double m = 1.0;         // Mass
     ImpAction SImp(N,a,m);
-    SImp.setPotential(potential);
-    metropolis.setAction(&SImp);
-    metropolis.setGammaFunctional(&gammaFunctional);
-    metropolis.runMetropolis();
-    metropolis.getStatistics();
-    metropolis.writeDataToFile("output/improvedAction_gamma.txt");
-    metropolis.writeStatisticsToFile("output/improvedAction_stats.txt");
-    metropolis.printEnergies();
-    metropolis.printAcceptanceRate();
+    SImp.setPotential(&HOPotential);
+    system.setAction(&SImp);
+    system.setGammaFunctional(&x1Correlator);
+    system.run();
+    system.getStatistics();
+    system.writeDataToFile("output/improvedAction_gamma.txt");
+    system.writeStatisticsToFile("output/improvedAction_stats.txt");
+    system.printEnergies();
+    system.printAcceptanceRate();
 
     programEnd = clock();
     cout << "Program complete. Time used: " << ((programEnd - programStart)/((double)CLOCKS_PER_SEC)) << endl;
     return 0;
-}
-
-double potential(double x)
-{
-    /*
-     * HO potential
-     */
-    return x*x/2.0;
-}
-
-double gammaFunctional(double * x, int n, int N)
-{
-    /*
-     * For exercise with x(i+1)*x(i)
-     */
-    double G = 0;
-    for (int i = 0; i < N; i++)
-    {
-        G += x[(i + n) % N] * x[i];
-    }
-    return G/((double) N);
-}
-
-double gammaFunctional2(double *x, int n, int N)
-{
-    /*
-     * For exercise with x(i+1)^3*x(i)^3
-     */
-    double G = 0;
-    for (int i = 0; i < N; i++)
-    {
-        G += x[(i + n) % N]*x[(i + n) % N]*x[(i + n) % N] * x[i]*x[i]*x[i];;
-    }
-    return G/((double) N);
 }

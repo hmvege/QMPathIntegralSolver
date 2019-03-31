@@ -1,24 +1,29 @@
 #ifndef ACTION_H
 #define ACTION_H
 
+#include <vector>
+#include "potentials/potential.h"
+
 class Action
 {
 protected:
-    double (*potential)(double x);
-    double a;
-    int N;
+    Potential *m_V = nullptr;
+    double m_a;
+    int m_N;
 public:
-    Action();
-    Action(int NPathPoints, double new_a);
+    Action(int N, double a);
+
     virtual ~Action() {}
-    virtual double getAction(double * x, int i);
+    virtual double getAction(std::vector<double> &x, int i);
+
     // Setters
-    void setPotential(double (*pot)(double x)) { potential = pot; }
-    void setLatticeSpacing(double new_a) { a = new_a; }
-    void setNLatticePoints(int new_N) { N = new_N; }
+    void setPotential(Potential *V) { m_V = V; }
+    void setLatticeSpacing(double a) { m_a = a; }
+    void setNLatticePoints(int N) { m_N = N; }
+
     // Getters
-    double getLatticeSpacing() { return a; }
-    int getNLatticePoints() { return N; }
+    double getLatticeSpacing() { return m_a; }
+    int getNLatticePoints() { return m_N; }
 };
 
 #endif // ACTION_H
