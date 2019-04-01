@@ -41,8 +41,6 @@ int main()
     System system(N, NCf, NCor, NTherm, epsilon, a);
     system.setAction(&S);
 
-
-
     // Using gammaFunctional
     system.setGammaFunctional(&x1Correlator);
     system.run();
@@ -51,17 +49,17 @@ int main()
     system.writeStatisticsToFile("output/gammaFunctional_stats.txt");
     system.printEnergies();
     system.printAcceptanceRate();
-    exit(1);
-//    // Using gammaFunctional2
-//    system.setGammaFunctional(&x3Correlator);
-//    system.run();
-//    system.getStatistics();
-//    system.writeDataToFile("output/gammaFunctional2_gamma.txt");
-//    system.writeStatisticsToFile("output/gammaFunctional2_stats.txt");
-//    system.printEnergies();
-//    system.printAcceptanceRate();
 
-    // Using improved action
+    // Using gammaFunctional2
+    system.setGammaFunctional(&x3Correlator);
+    system.run();
+    system.getStatistics();
+    system.writeDataToFile("output/gammaFunctional2_gamma.txt");
+    system.writeStatisticsToFile("output/gammaFunctional2_stats.txt");
+    system.printEnergies();
+    system.printAcceptanceRate();
+
+    // Using improved action, <x(t)x(0)>
     double m = 1.0;         // Mass
     ImpAction SImp(N,a,m);
     SImp.setPotential(&HOPotential);
@@ -71,6 +69,15 @@ int main()
     system.getStatistics();
     system.writeDataToFile("output/improvedAction_gamma.txt");
     system.writeStatisticsToFile("output/improvedAction_stats.txt");
+    system.printEnergies();
+    system.printAcceptanceRate();
+
+    // <x^3(t)x^3(0)>
+    system.setGammaFunctional(&x3Correlator);
+    system.run();
+    system.getStatistics();
+    system.writeDataToFile("output/improvedAction2_gamma.txt");
+    system.writeStatisticsToFile("output/improvedAction2_stats.txt");
     system.printEnergies();
     system.printAcceptanceRate();
 

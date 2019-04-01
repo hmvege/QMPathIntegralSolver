@@ -44,11 +44,12 @@ void System::update()
         xPrev = m_x[i];
         SPrev = m_S->getAction(m_x, i); // This only needs to be calculated once per site update, and then store the previous one.
         m_x[i] += m_epsilonDistribution(m_generator); // setting a new possible x-position to test for
-        deltaS = m_S->getAction(m_x, i) - SPrev;
-        if ((deltaS > 0) & (exp(-deltaS) < m_uniformDistribution(m_generator)))
+//        deltaS = m_S->getAction(m_x, i) - SPrev;
+        if (exp(-(m_S->getAction(m_x, i) - SPrev)) > m_uniformDistribution(m_generator))
         {
-            m_x[i] = xPrev;
             m_acceptanceCounter++;
+        } else {
+            m_x[i] = xPrev;
         }
     }
 }
