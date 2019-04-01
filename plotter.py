@@ -1,3 +1,6 @@
+"""
+This is some quite old and bad analysis code. Use at own risk.
+"""
 import numpy as np, matplotlib.pyplot as plt, sys
 import multiprocessing, time
 
@@ -89,7 +92,7 @@ class HOAnalysis:
 		plt.xlabel(r"N")
 		plt.ylabel(r"$\Delta E$")
 		plt.grid()
-		plt.savefig(figure_folder + "%s_linear_fit.png" % self.filename.split('.')[0], dpi=300)
+		plt.savefig(figure_folder + "%s_linear_fit.pdf" % self.filename.split('.')[0])
 
 	def plot_data(self, x=None):
 		if not x: x = np.arange(self.N_data_points)
@@ -100,7 +103,7 @@ class HOAnalysis:
 		plt.xlabel(r"$t$", fontsize="18")
 		plt.ylabel(r"$\Delta E$", fontsize="18")
 		plt.grid()
-		plt.savefig(figure_folder + "%s.png" % self.filename.split('.')[0],dpi=300)
+		plt.savefig(figure_folder + "%s.pdf" % self.filename.split('.')[0])
 
 	def write_bs_data(self,fname):
 		dat = np.zeros((len(self.x),3))
@@ -135,8 +138,8 @@ def gf_plot(figure_folder, output_folder, filename, plot_range=[0,-1]):
 	plt.xlabel(r"$t$",fontsize="18")
 	plt.ylabel(r"$\Delta E$",fontsize="18")
 	plt.grid()
-	plt.savefig(figure_folder + "%s.png" % filename.split('.')[0],dpi=300)
-	print figure_folder + "%s.png" % filename.split('.')[0], "figure created"
+	plt.savefig(figure_folder + "%s.pdf" % filename.split('.')[0])
+	print figure_folder + "%s.pdf" % filename.split('.')[0], "figure created"
 
 def run_G1Analysis():
 	G1Analysis = HOAnalysis("gammaFunctional_gamma.txt", output_folder)
