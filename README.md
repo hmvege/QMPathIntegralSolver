@@ -1,9 +1,9 @@
-# Path Integral solver for a Harmonic Oscillator
+# Path Integral solver for a Quantum Mechanical Harmonic Oscillator
 
 A small program which solves the quantum mechanical path integral based. Serves as a conceptual stepping stone to Lattice methods. Based on task in [this paper](https://arxiv.org/abs/hep-lat/0506036).
 
 <p align="center">
-    <img src="figures/path-integral.pdf" alt="Path integral illustration" width="600"/>
+    <img src="figures/path-integral.png" alt="Path integral illustration" width="600"/>
 </p>
     
 <p align="center">
