@@ -4,7 +4,7 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    random.cpp \
+    lib/random.cpp \
     actions/action.cpp \
     actions/impaction.cpp \
     observables/observable.cpp \
@@ -27,7 +27,7 @@ SOURCES += main.cpp \
 #QMAKE_CXXFLAGS_RELEASE += $$system(mpicxx --showme:compile) -DMPICH_IGNORE_CXX_SEEK
 
 HEADERS += \
-    random.h \
+    lib/random.h \
     actions/action.h \
     actions/impaction.h \
     observables/observable.h \
@@ -36,8 +36,6 @@ HEADERS += \
     observables/correlatorx1.h \
     observables/correlatorx3.h \
     system.h
-
-
 
 # Adds processor specific optimizations
 QMAKE_CFLAGS += -march=native

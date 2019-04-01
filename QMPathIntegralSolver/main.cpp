@@ -1,24 +1,22 @@
-#include <cmath>
-#include <iostream>
-#include <fstream>
-#include <iomanip>
+#include <chrono> // For random seed
 #include <random> // For Mersenne-Twister19937
-#include <ctime> // For random seed
-
 #include "system.h"
 #include "actions/action.h"
 #include "actions/impaction.h"
 #include "observables/correlatorx1.h"
 #include "observables/correlatorx3.h"
 #include "potentials/harmonicoscillator.h"
-//#include <mpi.h> // For parallelization later
+
+using std::chrono::steady_clock;
+using std::chrono::duration_cast;
+using std::chrono::duration;
 
 using namespace std;
 
 int main()
 {
-    clock_t programStart, programEnd; // Clocking for fun
-    programStart = clock();
+    steady_clock::time_point programStart;
+    programStart = steady_clock::now();
 
     double epsilon = 1.4;   // Random interval for picking a new path position to try
     double a = 0.5;         // Lattice spacing
@@ -81,7 +79,7 @@ int main()
     system.printEnergies();
     system.printAcceptanceRate();
 
-    programEnd = clock();
-    cout << "Program complete. Time used: " << ((programEnd - programStart)/((double)CLOCKS_PER_SEC)) << endl;
+    duration<double> programTime = duration_cast<duration<double>>(steady_clock::now() - programStart);
+    printf("Program complete. Time used: %f hours (%f seconds)\n", double(programTime.count())/3600.0, programTime.count());
     return 0;
 }

@@ -1,5 +1,4 @@
 #include <random>   // For Mersenne-Twister19937
-#include <ctime>    // For random seed
 #include <cmath>    // For exp()
 #include <fstream>
 #include <iostream>
